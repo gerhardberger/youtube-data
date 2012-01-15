@@ -128,7 +128,7 @@ Here the `order` is set to <i>published</i> by default.
 ```
 
 <h4>.uploader.newVideos(Object)</h4>
-If you are logged in, you can get the latest videos, that the people posted, whom you subscribed to.
+If you are logged in, you can get the latest videos, that the people posted, whom you subscribed to. Here the `order` is set to <i>published</i> by default.
 
 ``` js
 	ytf.uploader.videos({
