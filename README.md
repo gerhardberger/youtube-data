@@ -162,7 +162,7 @@ This returns the profile of the <b>name</b> you passed in. This obviously has di
 If you are logged in on your computer you can pass your username in, and it can get some of your data and your subscriptions. It stores an object of your data, that is like:
 
 ``` js
-	ytf.data: {
+	ytf.data = {
 		name: 'MyName',
 		link: 'https://www.youtube.com/profile?user=MyName',
 		subscriptions: [],
