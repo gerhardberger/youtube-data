@@ -16,7 +16,7 @@ If you retrieving videos, the returned array will contain a simplified structure
 		},
 		comments: {
 			count: 99,
-			link: 'url'
+			link: 'https://gdata.youtube.com/feeds/api/videos/d5bEny17MVo/comments?v=2.1'
 		},
 		desc: 'This a video description.',
 		duration: 60,
@@ -48,11 +48,11 @@ If you retrieving videos, the returned array will contain a simplified structure
 <h4>.search(Object)</h4>
 
 * <b>key</b> - The key string for searching.
-* start - The start index of the requested videos. (optional, default 1)
-* num - The amount of videos you want to get. If it is `'all'` it gives you all requested videos. (optional, default 50)
-* data - You can give to it an array and it will concatenate to the result. (optional)
-* complete: function(data, data2) - When the request done, this function will be executed (data contains the result array, data2 is the concatenated array if you passed in array to the `data` parameter).
-* error: function() - If there is an error, this function will be executed. (optional)
+* <b>start</b> - The start index of the requested videos. (optional, default 1)
+* <b>num</b> - The amount of videos you want to get. If it is `'all'` it gives you all requested videos. (optional, default 50)
+* <b>data</b> - You can give to it an array and it will concatenate to the result. (optional)
+* <b>complete:</b> function(<i>data</i>, <i>data2</i>) - When the request done, this function will be executed (data contains the result array, data2 is the concatenated array if you passed in array to the `data` parameter).
+* <b>error:</b> function() - If there is an error, this function will be executed. (optional)
 
 ``` js
 	ytf.search({
