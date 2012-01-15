@@ -1,6 +1,6 @@
-<h1>YouTube Framework</h1>
+<h1>YouTube Data API Framework</h1>
 
-This is a little JavaScript module for the YouTube data, and player API. It requires [jQuery](https://github.com/jquery/jquery). 
+This is a little JavaScript module for the YouTube data API. It requires [jQuery](https://github.com/jquery/jquery). 
 
 <h2>ytf</h2>
 
