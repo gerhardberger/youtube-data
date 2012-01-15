@@ -46,7 +46,6 @@ If you retrieving videos, the returned array will contain a simplified structure
 ```
 
 <h4>Video function structure</h4>
-
 This is the basic structure of every video and playlist request.
 
 * <b>start</b> - The start index of the requested videos. (<i>optional</i>, default 1)
@@ -57,7 +56,6 @@ This is the basic structure of every video and playlist request.
 * <b>error:</b> function() - If there is an error, this function will be executed. (<i>optional</i>)
 
 <h4>.search(Object)</h4>
-
 * <b>key</b> - The key string for searching.
 
 ``` js
@@ -76,7 +74,6 @@ This is the basic structure of every video and playlist request.
 ```
 
 <h4>.related(Object)</h4>
-
 * <b>id</b> - The ID of the video, for which you want to get the related videos.
 
 ``` js
@@ -94,7 +91,6 @@ This is the basic structure of every video and playlist request.
 
 <h4>.uploader.videos(Object)</h4>
 Here the `order` is set to <i>published</i> by default.
-
 * <b>name</b> - The name of the uploader, whose uploads you want to get.
 
 ``` js
@@ -111,7 +107,6 @@ Here the `order` is set to <i>published</i> by default.
 ```
 
 <h4>.uploader.favorites(Object)</h4>
-
 * <b>name</b> - The name of the uploader, whose favorites you want to get.
 
 ``` js
@@ -141,7 +136,6 @@ If you are logged in, you can get the latest videos, that the people posted, who
 ```
 
 <h4>.uploader.playlists(Object)</h4>
-
 * <b>name</b> - The name of the uploader, whose playlists you want to get.
 
 ``` js
@@ -164,9 +158,7 @@ This returns the profile of the <b>name</b> you passed in. This obviously has di
 ```
 
 <h3>Retrieving other data</h3>
-
 <h4>.login(name, callback)</h4>
-
 If you are logged in on your computer you can pass your username in, and it can get some of your data and your subscriptions. It stores an object of your data, that is like:
 
 ``` js
