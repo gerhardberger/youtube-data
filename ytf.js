@@ -5,18 +5,56 @@
 }('ytf', function() {
 	each = function(a,b) {
 		for (var i in a)
-			b.call(a[i], a[i], (_.isNull(parseInt(i)) ? i : parseInt(i)))
+			b.call(a[i], a[i], (isNull(parseInt(i)) ? i : parseInt(i)))
 	}
+	function isEmpty(a) {
+		if (a instanceof Array || typeof a === 'string')
+			return a.length===0
+		for (var c in a)
+			if(Object.prototype.hasOwnProperty.call(a,c))
+				return!1
+		return!0
+	}
+	function isFunction(a) {
+		return! (!a || !a.constructor || !a.call || !a.apply)
+	}
+	function isUndefined(a) {
+		return (a === void 0)
+	}
+	function isArray(a) {
+		return (a instanceof Array)
+	}
+	function isObject(a) {
+		return (a instanceof Object)
+	}
+	function isString(a) {
+		return (typeof a === 'string')
+	}
+	isNull = function(a) {
+    return a === null;
+  };
+  map = function(o,fn) {
+    var results = []
+    if (o == null) return results
+    each(o, function(e, index, list) {
+      results.push(fn.call(null,e))
+    });
+    return results;
+  };
+	var tag = document.createElement('script')
+	    tag.src = "http://www.youtube.com/player_api"
+	    var firstScriptTag = document.getElementsByTagName('script')[0]
+	    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
 	getVideos = function(str,s,m,r,err,ord,tp,fn) {
 		$.getJSON(str+'v=2.1&alt=json&start-index='+s+'&max-results='+((m>50)?50:m)+'&orderby='+((ord=='views')?'viewCount':ord), function(data) {
-			if (_.isNull(data)) {
+			if (isNull(data)) {
 				throw new Error('Error! Cannot load videos!')
-				if (!_.isNull(err))	err.call()
+				if (!isNull(err))	err.call()
 				return
 			}
-			var list = _.map(data.feed.entry, function(e) {return (tp=='plist')?e:yt.simplify(e)})
+			var list = map(data.feed.entry, function(e) {return (tp=='plist')?e:yt.simplify(e)})
 			if ((m == Infinity) || (m > data.feed.openSearch$totalResults.$t)) m = data.feed.openSearch$totalResults.$t
-			if (_.isEmpty(r))
+			if (isEmpty(r))
 				r = list
 			else
 				r = r.concat(list)
@@ -35,11 +73,11 @@
 			subscriptions: []
 		},
 		login: function(name,fn) {
-			if ((_.isEmpty(name)) || (name == this.data.name))
+			if ((isEmpty(name)) || (name == this.data.name))
 				return
 			console.log(name+' is trying to log in...')
 			$.getJSON('https://gdata.youtube.com/feeds/api/users/'+name+'?v=2.1&alt=json', function(data) {
-				if (_.isNull(data)) {
+				if (isNull(data)) {
 					throw new Error('Error! Not existing username!')
 					return
 				}
@@ -60,10 +98,10 @@
 			}	
 		},
 		loadSubscriptions: function(num,fn) {
-			if (!_.isEmpty(this.subscriptions))
+			if (!isEmpty(this.subscriptions))
 				return
 			$.getJSON('https://gdata.youtube.com/feeds/api/users/'+this.data.name+'/subscriptions?v=2.1&start-index='+num+'&max-results=50&alt=json', function(data) {
-				if (_.isNull(data)) {
+				if (isNull(data)) {
 					throw new Error('Error! Cannot load subscriptions!')
 					return
 				}
@@ -79,12 +117,12 @@
 			return {
 				published: a.published.$t,
 				author: {
-					name: (!_.isUndefined(a.author[0])) ? a.author[0].name.$t : null,
+					name: (!isUndefined(a.author[0])) ? a.author[0].name.$t : null,
 					type: a.media$group.media$credit.yt$type
 				},
 				comments: {
-					link: (!_.isUndefined(a.gd$comments)) ? a.gd$comments.gd$feedLink.href : null,
-					count: (!_.isUndefined(a.gd$comments)) ? a.gd$comments.gd$feedLink.countHint : null,
+					link: (!isUndefined(a.gd$comments)) ? a.gd$comments.gd$feedLink.href : null,
+					count: (!isUndefined(a.gd$comments)) ? a.gd$comments.gd$feedLink.countHint : null,
 				},
 				category: a.media$group.media$category.$t,
 				duration: a.media$group.yt$duration.seconds,
@@ -98,7 +136,7 @@
 			}
 		},
 		newVideos: function(o) {
-			if (_.isEmpty(yt.data))
+			if (isEmpty(yt.data))
 				return
 			var s = (o.start) ? o.start : 1
 				, m = (o.num) ? ((o.num == 'all')?Infinity:o.num) : Infinity
@@ -156,110 +194,104 @@
 			},
 			profile: function(name, fn) {
 				$.getJSON('https://gdata.youtube.com/feeds/api/users/'+name+'?v=2.1&alt=json', function(data) {
-					if (_.isNull(data)) {
+					if (isNull(data)) {
 						throw new Error('Error! Not existing user!')
 						return
 					}
 					fn.call(null, data.entry)
 				})
 			}
-		}
-	}
-
-	var tag = document.createElement('script')
-	    tag.src = "http://www.youtube.com/player_api"
-	    var firstScriptTag = document.getElementsByTagName('script')[0]
-	    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
-	var player = {
-		data: {},
-		load: function(v) {
-			this.data = v
-			player.video = new YT.Player('video', {
-	      videoId: v.id,
-				playerVars: {
-					'autoplay': 1,
-					'autohide': 1,
-					'color': 'white',
-					//'controls': 0,
-					'modestbranding': 1,
-					'showinfo': 0,
-					'theme': 'light'
-				},
-				events: {
-					'onStateChange': player.change
-				}
-	    })
 		},
-		change: function(event) {
-			console.log(event)
-		},
-		comments: {
-			list: [],
-			load: function(fn) {
-				player.comments.list = []
-				$.getJSON('https://gdata.youtube.com/feeds/api/videos/'+player.data.id+'/comments?v=2.1&alt=json&start-index=1&max-results=50'+user.key, function(data) {
-					if (_.isNull(data)) {
-						console.log('Error! Cannot load comments!')
-					return
+		player: {
+			data: {},
+			load: function(v) {
+				this.data = v
+				yt.player.video = new YT.Player('video', {
+		      videoId: v.id,
+					playerVars: {
+						'autoplay': 1,
+						'autohide': 1,
+						'color': 'white',
+						//'controls': 0,
+						'modestbranding': 1,
+						'showinfo': 0,
+						'theme': 'light'
+					},
+					events: {
+						'onStateChange': yt.player.change
 					}
-					player.comments.list = data.feed.entry
-					fn.call(null, data.feed.openSearch$totalResults.$t)
-				})
+		    })
 			},
-			more: function(fn) {
-				$.getJSON('https://gdata.youtube.com/feeds/api/videos/'+player.data.id+'/comments?v=2.1&alt=json&start-index='+player.comments.list.length+'&max-results=50'+user.key, function(data) {
-					if (_.isNull(data)) {
-						console.log('Error! Cannot load more comments!')
-					return
-					}
-					player.comments.list = player.comments.list.concat(data.feed.entry)
-					fn.call(null, data.feed.entry, data.feed.openSearch$totalResults.$t)
-				})
+			change: function(event) {
+				console.log(event)
+			},
+			comments: {
+				list: [],
+				load: function(fn) {
+					yt.player.comments.list = []
+					$.getJSON('https://gdata.youtube.com/feeds/api/videos/'+yt.player.data.id+'/comments?v=2.1&alt=json&start-index=1&max-results=50'+user.key, function(data) {
+						if (isNull(data)) {
+							console.log('Error! Cannot load comments!')
+						return
+						}
+						yt.player.comments.list = data.feed.entry
+						fn.call(null, data.feed.openSearch$totalResults.$t)
+					})
+				},
+				more: function(fn) {
+					$.getJSON('https://gdata.youtube.com/feeds/api/videos/'+yt.player.data.id+'/comments?v=2.1&alt=json&start-index='+yt.player.comments.list.length+'&max-results=50'+user.key, function(data) {
+						if (isNull(data)) {
+							console.log('Error! Cannot load more comments!')
+						return
+						}
+						yt.player.comments.list = yt.player.comments.list.concat(data.feed.entry)
+						fn.call(null, data.feed.entry, data.feed.openSearch$totalResults.$t)
+					})
+				}
+			},
+			play: function() {
+				yt.player.video.playVideo()
+			},
+			pause: function() {
+				yt.player.video.pauseVideo()
+			},
+			stop: function() {
+				yt.player.video.stopVideo()
+			},
+			seekTo: function(num) {
+				yt.player.video.seekTo(num, true)
+			},
+			clear: function() {
+				yt.player.video.clearVideo()
+			},
+			mute: function() {
+				yt.player.video.mute()
+			},
+			unMute: function() {
+				yt.player.video.unMute()
+			},
+			isMuted: function() {
+				return yt.player.video.isMuted()
+			},
+			setVolume: function(num) {
+				yt.player.video.setVolume(num)
+			},
+			getVolume: function() {
+				return yt.player.video.getVolume()
+			},
+			getQuality: function() {
+				return yt.player.video.getPlaybackQuality()
+			},
+			setQuality: function(s) {
+				yt.player.video.setPlaybackQuality(s)
+			},
+			getURL: function() {
+				return yt.player.video.getVideoUrl()
+			},
+			getDuration: function() {
+				return yt.player.video.getDuration()
 			}
-		},
-		play: function() {
-			player.video.playVideo()
-		},
-		pause: function() {
-			player.video.pauseVideo()
-		},
-		stop: function() {
-			player.video.stopVideo()
-		},
-		seekTo: function(num) {
-			player.video.seekTo(num, true)
-		},
-		clear: function() {
-			player.video.clearVideo()
-		},
-		mute: function() {
-			player.video.mute()
-		},
-		unMute: function() {
-			player.video.unMute()
-		},
-		isMuted: function() {
-			return player.video.isMuted()
-		},
-		setVolume: function(num) {
-			player.video.setVolume(num)
-		},
-		getVolume: function() {
-			return player.video.getVolume()
-		},
-		getQuality: function() {
-			return player.video.getPlaybackQuality()
-		},
-		setQuality: function(s) {
-			player.video.setPlaybackQuality(s)
-		},
-		getURL: function() {
-			return player.video.getVideoUrl()
-		},
-		getDuration: function() {
-			return player.video.getDuration()
 		}
 	}
-
 	return yt
 })
