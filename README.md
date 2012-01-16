@@ -22,7 +22,7 @@ If you retrieving videos, the returned array will contain a simplified structure
 		duration: 60,
 		id: 'd5bEny17MVo',
 		keywords: 'apple, banana, orange, pear',
-		pusblished: '2007-10-02T08:10:50.000Z',
+		published: '2007-10-02T08:10:50.000Z',
 		rating: {
 			numDislikes: 0,
 			numLikes: 9999
