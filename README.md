@@ -126,7 +126,7 @@ Here the `order` is set to <i>published</i> by default.
 If you are logged in, you can get the latest videos, that the people posted, whom you subscribed to. Here the `order` is set to <i>published</i> by default.
 
 ``` js
-	ytf.uploader.videos({
+	ytf.newVideos({
 		start: 1,
 		num: 'all',
 		complete: function(data) {
