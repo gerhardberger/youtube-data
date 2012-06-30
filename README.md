@@ -1,6 +1,6 @@
 <h1>YouTube Data API</h1>
 
-This is a simple library for the [YouTuba Data API 2.0](https://developers.google.com/youtube/2.0/developers_guide_protocol_audience). It allows you to get data in small chunks, hence faster performance.
+This is a simple library for the [YouTuba Data API 2.0](https://developers.google.com/youtube/2.0/developers_guide_protocol_audience). It allows you to get data in small chunks, hence faster performance. Right now it requires jQuery and underscore.
 
 <h4>Getting started!</h4>
 
