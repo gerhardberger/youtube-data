@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+
+	<!-- Basic Page Needs
+  ================================================== -->
+	<meta charset="utf-8">
+	<title>YouTubeData</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<!-- Mobile Specific Metas
+  ================================================== -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<!-- CSS
+  ================================================== -->
+	<link rel="stylesheet" href="stylesheets/base.css">
+	<link rel="stylesheet" href="stylesheets/skeleton.css">
+	<link rel="stylesheet" href="stylesheets/layout.css">
+
+	<!-- JS
+  ================================================== -->
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+	<script src="../underscore.js" type="text/javascript"></script>
+	<script type="text/javascript" src="huk.js"></script>
+	<script type="text/javascript" src="../index.js"></script>
+
+
+	<!--[if lt IE 9]>
+		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+	<!-- Favicons
+	================================================== -->
+	<link rel="shortcut icon" href="images/favicon.ico">
+	<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+
+
+	<!-- End of Boilerplate
+	================================================== -->
+
+	<script type="text/javascript">
+	/*huk.bundle('ytVideo', function(data) {
+		var name = data.author[0].name
+			, profpic = ytd.getProfilePicture(data.author[0].yt$userId)
+			, thumbnail = data.media$group.media$thumbnail[0].url
+		return huk.li({
+			content: huk()
+				.img(thumbnail)
+				.strong('<<value.title.$t>>')
+				.small(' by ')
+				.img({src: profpic, title: name})
+				.a({
+					content: ' [Whatch]'
+					, href: 'http://www.youtube.com/watch?v=<<value.media$group.yt$videoid.$t>>'
+					, target: '_blank'
+				})
+			.val()
+		})
+	})*/
+
+	//huk($div).ytVideo(res, true).append()
+
+
+
+	var huk$video = function(data, dest, ins) {
+		huk(dest)
+			.list({
+				items: data
+				, class: 'square'
+				, justItems: true
+				, itemArgs: {
+					complete: function(data) {
+						$(this).find('small').append(data.author[0].name.$t)
+						$(this).find('img').attr('src', data.media$group.media$thumbnail[0].url).css('height', '30px')
+					}
+					, content: [huk.img(), huk.strong('<<value.title.$t>>'), huk.small(' by '), huk.a({content: ' [Whatch]', href: 'http://www.youtube.com/watch?v=<<value.media$group.yt$videoid.$t>>', target: '_blank'})]
+				}
+			})
+		[ins]()
+	}
+
+
+	$(function() {
+
+		var ytd = new YouTubeData();
+
+		// Search
+		$('#search form a').on('click', function(e) {
+			e.preventDefault()
+
+			var $div = $('#search')
+			ytd.search({
+				key: $div.find('form #q').val()
+				, count: $div.find('form #count').val()
+				, chunk: 5
+				, stream: true
+				, params: {
+					orderby: $div.find('form input[name="orderBy"]:checked').val()
+				}
+				, start: function() {
+					if ($div.find('ul').length == 0) huk($div).ul().append()
+					else $div.find('ul').html('')
+				}
+				, data: function(err, res) {
+					if (err) return;
+					huk$video(res, $div.find('ul'), 'append')
+				}
+				, end: function() {
+					if ($div.find('button').length > 0) return;
+					huk($div.find('ul'))
+						.button({
+							content: 'Toggle!'
+							, click: function() {
+								$div.find('ul').toggle()
+							}
+						})
+					.before()
+				}
+			})
+		})
+
+
+		// Subscriptions
+		$('#subs form a').on('click', function() {
+			var $div = $('#subs')
+			ytd.subscriptions({
+				user: $div.find('form input[type="text"]').val()
+				, stream: true
+				, start: function() {
+					if ($div.find('ul').length == 0) huk($div).ul().append()
+					else $div.find('ul').html('')
+				}
+				, data: function(err, res) {
+					if (err) return;
+					console.log(res)
+					huk($div.find('ul'))
+						.list({
+							items: res
+							, justItems: true
+							, class: 'square'
+							, itemArgs: {
+								content: [huk.img({src: '<<value.media$thumbnail.url>>', css: {height: '20px'}}), ' ', huk.strong('<<value.yt$username.display>>')]
+							}
+						})
+					.append()
+				}
+				, end: function() {
+					if ($div.find('button').length > 0) return;
+					huk($div.find('ul'))
+						.button({
+							content: 'Toggle!'
+							, click: function() {
+								$div.find('ul').toggle()
+							}
+						})
+					.before()
+				}
+			})
+		})
+
+
+		// New subscription videos
+		$('#news form a').on('click', function() {
+			var $div = $('#news')
+			ytd.newVideos({
+				user: $div.find('form input[type="text"]').val()
+				, stream: true
+				, start: function() {
+					if ($div.find('ul').length == 0) huk($div).ul().append()
+					else $div.find('ul').html('')
+				}
+				, data: function(err, res) {
+					if (err) return;
+					huk$video(res, $div.find('ul'), 'append')
+				}
+				, end: function() {
+					if ($div.find('button').length > 0) return;
+					huk($div.find('ul'))
+						.button({
+							content: 'Toggle!'
+							, click: function() {
+								$div.find('ul').toggle()
+							}
+						})
+					.before()
+				}
+			})
+		})
+
+
+		// User uploads
+		$('#ups form a').on('click', function() {
+			var $div = $('#ups')
+			ytd.uploads({
+				user: $div.find('form input[type="text"]').val()
+				, count: 20
+				, stream: true
+				, start: function() {
+					if ($div.find('ul').length == 0) huk($div).ul().append()
+					else $div.find('ul').html('')
+				}
+				, data: function(err, res) {
+					if (err) return;
+					huk$video(res, $div.find('ul'), 'append')
+				}
+				, end: function() {
+					if ($div.find('button').length > 0) return;
+					huk($div.find('ul'))
+						.button({
+							content: 'Toggle!'
+							, click: function() {
+								$div.find('ul').toggle()
+							}
+						})
+					.before()
+				}
+			})
+		})
+
+		// Comments
+		$('#comms form a').on('click', function() {
+			var $div = $('#comms')
+			ytd.comments({
+				videoId: $div.find('form input[type="text"]').val()
+				, count: 20
+				, stream: true
+				, start: function() {
+					if ($div.find('ul').length == 0) huk($div).ul({class: 'square'}).append()
+					else $div.find('ul').html('')
+				}
+				, data: function(err, res) {
+					if (err) return;
+					huk($div.find('ul'))
+						.list({
+							items: res
+							, justItems: true
+							, itemArgs: {
+								complete: function(data) { $(this).find('strong').text(data.author[0].name.$t+': ') }
+								, content: [huk.strong(), '<<value.content.$t>>']
+							}
+						})
+					.append()
+				}
+				, end: function() {
+					if ($div.find('button').length > 0) return;
+					huk($div.find('ul'))
+						.button({
+							content: 'Toggle!'
+							, click: function() {
+								$div.find('ul').toggle()
+							}
+						})
+					.before()
+				}
+			})
+		})
+
+	})
+	</script>
+
+</head>
+<body>
+
+
+
+	<!-- Primary Page Layout
+	================================================== -->
+
+	<!-- Delete everything in this .container and get started on your own site! -->
+
+	<div class="container">
+		<div class="sixteen columns">
+			<h1 class="remove-bottom" style="margin-top: 40px">YouTubeData</h1>
+			<h5>Version 2.0</h5>
+			<hr class="medium" />
+		</div>
+
+		<div class="doc-section" id="search">
+			<h3>.search(<small>options</small>)</h3>
+			<form>
+				<label>Search for:</label>
+				<input type="text" id="q" />
+				<label>Number of videos:</label>
+				<input type="text" id="count" value="20" />
+				<fieldset>
+					<legend>Order By</legend>
+					<label for="relev"><input type="radio" id="relev" name="orderBy" value="relevance" checked="true" /><span>Relevance</span></label>
+					<label for="views"><input type="radio" id="views" name="orderBy" value="viewCount" /><span>Views</span></label>
+					<label for="publi"><input type="radio" id="publi" name="orderBy" value="published" /><span>Published</span></label>
+				</fieldset>
+				<a class="button" href="#">Search!</a>
+			</form>
+		</div>
+
+		<hr class="large" />
+
+		<div class="doc-section" id="subs">
+			<h3>.subscriptions(<small>options</small>)</h3>
+			<form>
+				<label>Username:</label>
+				<input type="text" />
+				<a class="button">Load!</a>
+			</form>
+		</div>
+
+		<hr class="large" />
+
+		<div class="doc-section" id="news">
+			<h3>.newVideos(<small>options</small>)</h3>
+			<form>
+				<label>Username:</label>
+				<input type="text" />
+				<a class="button">Load!</a>
+			</form>
+		</div>
+
+		<hr class="large" />
+
+		<div class="doc-section" id="ups">
+			<h3>.uploads(<small>options</small>)</h3>
+			<form>
+				<label>Username:</label>
+				<input type="text" />
+				<a class="button">Load!</a>
+			</form>
+		</div>
+
+		<hr class="large" />
+
+		<div class="doc-section" id="comms">
+			<h3>.comments(<small>options</small>)</h3>
+			<form>
+				<label>videoId:</label>
+				<input type="text" value="WfLu-CG50rQ" />
+				<a class="button">Load!</a>
+			</form>
+		</div>
+	</div><!-- container -->
+
+
+<!-- End Document
+================================================== -->
+</body>
+</html>
